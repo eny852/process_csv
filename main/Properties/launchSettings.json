@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "main": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\Users\\juraj.dobrota.SYNERGON\\source\\repos\\main\\main\\test.csv"
+    }
+  }
+}
