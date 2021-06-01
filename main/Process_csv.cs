@@ -88,6 +88,7 @@ namespace main
                 }
                     
             }
+            Console.WriteLine("Program has ended");
         }
     }
 }
