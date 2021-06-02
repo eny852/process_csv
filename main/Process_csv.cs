@@ -49,6 +49,39 @@ namespace main
 
     class Process_csv
     {
+        public static string DivSwitch(int num)
+        {
+            switch (num)
+            {
+                case 10: return "CEM";
+                case 11: return "AFR";
+                case 30: return "AGG";
+                case 40: return "RMC";
+                default: return "";
+            }
+        }
+
+        public static string CountrySwitch(string companyCode)
+        {
+            switch (companyCode)
+            {
+                case "SK": return "SVK";
+                case "HU": return "HUN";
+                case "RS": return "SRB";
+                case "AT": return "AUT";
+                default: return "";
+            }
+        }
+
+        public static string RandNum()
+        {
+            Random rnd = new Random();
+            string random = "";
+            for (int i = 0; i < 10; i++)
+                random += $"{rnd.Next(0, 10)}";
+
+            return random;
+        }
         static void Main(string[] args)
         {
             if (!File.Exists(args[0]))
@@ -68,6 +101,8 @@ namespace main
                 foreach (var rec in records)
                 {
                     string name = rec.CompanyCode.Substring(0, 2);
+
+                    //PDF z InvoiceNumber
                     if (!File.Exists($"{path}\\{name}_pdf\\{rec.InvoiceNumber}.pdf"))
                     {
                         if(!Directory.Exists($"{path}\\{name}_pdf")){ Directory.CreateDirectory($"{path}\\{name}_pdf"); }
@@ -85,6 +120,8 @@ namespace main
                             doc.Close();
                         }
                     }
+
+                    //XML z InvoiceNumber
                     if (!File.Exists($"{path}\\{name}_xml\\{name}.xml"))
                     {
                         if (!Directory.Exists($"{path}\\{name}_xml")) { Directory.CreateDirectory($"{path}\\{name}_xml"); }
@@ -96,8 +133,30 @@ namespace main
                             fs.Write(Encoding.UTF8.GetBytes(text));
                         }
                     }
+
+                    //PDF z DeliveryNotes podla Division a Country
+                    string rnd = RandNum();
+                    if (!File.Exists($"{path}\\DeliveryNotes\\{DivSwitch(rec.Division)}\\{CountrySwitch(rec.CompanyCode.Substring(0, 2))}\\{rec.DeliveryNoteNumber}_{rnd}.pdf"))
+                    {
+                        if (!Directory.Exists($"{path}\\DeliveryNotes\\{DivSwitch(rec.Division)}\\{CountrySwitch(rec.CompanyCode.Substring(0, 2))}"))
+                        {
+                            Directory.CreateDirectory($"{path}\\DeliveryNotes\\{DivSwitch(rec.Division)}\\{CountrySwitch(rec.CompanyCode.Substring(0, 2))}");
+                        }
+                        using (FileStream fs = new FileStream($"{path}\\DeliveryNotes\\{DivSwitch(rec.Division)}\\{CountrySwitch(rec.CompanyCode.Substring(0, 2))}\\{rec.DeliveryNoteNumber}_{rnd}.pdf", FileMode.Create, FileAccess.Write))
+                        {
+                            fs.SetLength(50000);
+                            Document doc = new Document(PageSize.A4);
+                            PdfWriter.GetInstance(doc, fs);
+
+                            doc.Open();
+
+                            doc.Add(new Paragraph($"{nameof(rec.DeliveryNoteNumber)}:{rec.DeliveryNoteNumber}"));
+
+                            doc.Close();
+                        }
+                    }
                 }
-                    
+
             }
             Console.WriteLine("Program has ended");
         }
