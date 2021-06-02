@@ -4,6 +4,7 @@ using CsvHelper.Configuration.Attributes;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -66,23 +67,33 @@ namespace main
                 path = path.Remove(path.LastIndexOf('\\'));
                 foreach (var rec in records)
                 {
-                    if (!File.Exists($"{path}\\{rec.SoldToLanguage}_pdf\\{rec.InvoiceNumber}.pdf"))
+                    string name = rec.CompanyCode.Substring(0, 2);
+                    if (!File.Exists($"{path}\\{name}_pdf\\{rec.InvoiceNumber}.pdf"))
                     {
-                        if(!Directory.Exists($"{path}\\{rec.SoldToLanguage}_pdf")){ Directory.CreateDirectory($"{path}\\{rec.SoldToLanguage}_pdf"); }
+                        if(!Directory.Exists($"{path}\\{name}_pdf")){ Directory.CreateDirectory($"{path}\\{name}_pdf"); }
 
-                        Document doc = new Document(PageSize.A4);
-                        PdfWriter.GetInstance(doc, new FileStream($"{path}\\{rec.SoldToLanguage}_pdf\\{rec.InvoiceNumber}.pdf", FileMode.Create));
-                        doc.Open();
-                        doc.Add(new Paragraph($"{nameof(rec.InvoiceNumber)}:{rec.InvoiceNumber}"));
-                        doc.Close();
-                    }
-                    if (!File.Exists($"{path}\\{rec.SoldToLanguage}_xml\\{rec.InvoiceNumber}.xml"))
-                    {
-                        if (!Directory.Exists($"{path}\\{rec.SoldToLanguage}_xml")) { Directory.CreateDirectory($"{path}\\{rec.SoldToLanguage}_xml"); }
-
-                        using (StreamWriter outputFile = new StreamWriter($"{path}\\{rec.SoldToLanguage}_xml\\{rec.InvoiceNumber}.xml"))
+                        using (FileStream fs = new FileStream($"{path}\\{name}_pdf\\{rec.InvoiceNumber}.pdf", FileMode.Create, FileAccess.Write))
                         {
-                            outputFile.WriteLine($"{nameof(rec.InvoiceNumber)}:{rec.InvoiceNumber}");
+                            fs.SetLength(500000);
+                            Document doc = new Document(PageSize.A4);
+                            PdfWriter.GetInstance(doc, fs);
+
+                            doc.Open();
+
+                            doc.Add(new Paragraph($"{nameof(rec.InvoiceNumber)}:{rec.InvoiceNumber}"));
+
+                            doc.Close();
+                        }
+                    }
+                    if (!File.Exists($"{path}\\{name}_xml\\{name}.xml"))
+                    {
+                        if (!Directory.Exists($"{path}\\{name}_xml")) { Directory.CreateDirectory($"{path}\\{name}_xml"); }
+
+                        using (FileStream fs = new FileStream($"{path}\\{name}_xml\\{rec.InvoiceNumber}.xml", FileMode.Create, FileAccess.Write))
+                        {
+                            fs.SetLength(500000);
+                            string text = $"{nameof(rec.InvoiceNumber)}:{rec.InvoiceNumber}";
+                            fs.Write(Encoding.UTF8.GetBytes(text));
                         }
                     }
                 }
