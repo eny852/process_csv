@@ -70,6 +70,7 @@ namespace main
                 case "RS": return "SRB";
                 case "AT": return "AUT";
                 case "CZ": return "SVK";
+                case "DE": return "AUT";
                 default: return "";
             }
         }
