@@ -69,6 +69,7 @@ namespace main
                 case "HU": return "HUN";
                 case "RS": return "SRB";
                 case "AT": return "AUT";
+                case "CZ": return "SVK";
                 default: return "";
             }
         }
