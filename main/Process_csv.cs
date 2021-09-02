@@ -57,6 +57,7 @@ namespace main
                 case 11: return "AFR";
                 case 30: return "AGG";
                 case 40: return "RMC";
+                case 99: return "CEM";
                 default: return "";
             }
         }
@@ -68,7 +69,7 @@ namespace main
                 case "SK": return "SVK";
                 case "HU": return "HUN";
                 case "RS": return "SRB";
-                case "AT": return "AUT";
+                case "AT": return "SVK";
                 case "CZ": return "SVK";
                 case "DE": return "AUT";
                 default: return "";
@@ -104,8 +105,10 @@ namespace main
                 {
                     string name = rec.CompanyCode.Substring(0, 2);
 
+                    if (name == "AT") { name = "AU"; }
+
                     //PDF z InvoiceNumber
-                    if (!File.Exists($"{path}\\{name}_pdf\\{rec.InvoiceNumber}.pdf"))
+                    if (!File.Exists($"{path}\\{name}_pdf\\{rec.InvoiceNumber}.pdf") && rec.SoldToStatus != String.Empty)
                     {
                         if(!Directory.Exists($"{path}\\{name}_pdf")){ Directory.CreateDirectory($"{path}\\{name}_pdf"); }
 
@@ -118,13 +121,14 @@ namespace main
                             doc.Open();
 
                             doc.Add(new Paragraph($"{nameof(rec.InvoiceNumber)}:{rec.InvoiceNumber}"));
+                            doc.Add(new Paragraph($"\ncreated by Juraj Dobrota @Synergon"));
 
                             doc.Close();
                         }
                     }
 
                     //XML z InvoiceNumber
-                    if (!File.Exists($"{path}\\{name}_xml\\{name}.xml"))
+                    if (!File.Exists($"{path}\\{name}_xml\\{name}.xml") && rec.SoldToStatus != String.Empty)
                     {
                         if (!Directory.Exists($"{path}\\{name}_xml")) { Directory.CreateDirectory($"{path}\\{name}_xml"); }
 
@@ -132,6 +136,8 @@ namespace main
                         {
                             fs.SetLength(500000);
                             string text = $"{nameof(rec.InvoiceNumber)}:{rec.InvoiceNumber}";
+
+                            text += "\ncreated by Juraj Dobrota @Synergon";
                             fs.Write(Encoding.UTF8.GetBytes(text));
                         }
                     }
@@ -153,6 +159,7 @@ namespace main
                             doc.Open();
 
                             doc.Add(new Paragraph($"{nameof(rec.DeliveryNoteNumber)}:{rec.DeliveryNoteNumber}"));
+                            doc.Add(new Paragraph($"\ncreated by Juraj Dobrota @Synergon"));
 
                             doc.Close();
                         }
